@@ -4,6 +4,7 @@
 """ALXOverflow Engine room 🚀"""
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
+from src.db import db
 from os import environ
 import uvicorn
 
@@ -16,6 +17,17 @@ def init_app():
                       in the ALX Software Engineering Program.",
                   version="1.0.0")
     app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+    @app.on_event("startup")
+    async def startup():
+        try:
+            await db.connect()
+        except:
+            print("An error has occured")
+
+    @app.on_event("shutdown")
+    async def shutdown():
+        await db.disconnect()
 
     @app.get('/')
     def home():
