@@ -36,4 +36,4 @@ if __name__ == "__main__":
         port = 8000
     if host is None:
         host = 'localhost'
-    uvicorn.run("src.main:app", host=host, port=port, reload=True)
+    uvicorn.run("src.main:app", host=host, port=int(port), reload=True)
