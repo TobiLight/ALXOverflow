@@ -11,6 +11,38 @@ router = APIRouter(
     responses={404: {"description": "Not found"}})
 
 
+@router.post("/login", summary="User login", response_model=Union[UserSignInOutput, dict], response_model_exclude_none=True)
+async def login_user(sign_in: UserSignIn):
+    """
+
+    """
+    existing_user = await db.user.find_unique(where={"email": sign_in.email})
+    if existing_user:
+        password = verify_password(sign_in.password, existing_user.password)
+        if password is False:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login!")
+
+        user_token = create_access_token(subject="123", expires_delta=5)
+        user = {
+            "id": existing_user.id,
+            "firstname": existing_user.first_name,
+            "lastname": existing_user.last_name,
+            "username": existing_user.username,
+            "email": existing_user.email,
+            "role": existing_user.role,
+            "bio": existing_user.bio,
+            "profile_picture": existing_user.profile_picture,
+            "reputation_score": existing_user.reputation_score,
+            "created_at": existing_user.created_at,
+            "updated_at": existing_user.updated_at
+        }
+        user = UserProfile(**user)
+        return UserSignInOutput(token=user_token, user=user)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid login!")
+
+
 @router.post("/signup", summary='Create a new user', response_model=Union[UserSignUpOutput, dict], response_model_exclude_none=True)
 async def create_account(sign_up: UserSignUp):
     """"""
