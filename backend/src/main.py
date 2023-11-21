@@ -9,6 +9,7 @@ from os import environ
 import uvicorn
 
 
+
 def init_app():
     """Initialize app"""
     app = FastAPI(title="ALXOverflow | Where Questions Find Answers 🚀",
@@ -22,6 +23,7 @@ def init_app():
     async def startup():
         try:
             await db.connect()
+            print("Database Connected!")
         except:
             print("An error has occured")
 
@@ -30,8 +32,8 @@ def init_app():
         await db.disconnect()
 
     @app.get('/')
-    def home():
-        return "welcome home!"
+    def health_check():
+        return {"status": "OK"}
 
     from src.api import api
     app.include_router(api)
@@ -42,8 +44,8 @@ app = init_app()
 
 
 if __name__ == "__main__":
-    port = environ.get("alxo_port")
-    host = environ.get("alxo_host")
+    port = environ.get("DB_PORT")
+    host = environ.get("DB_HOST")
     if port is None:
         port = 8000
     if host is None:
