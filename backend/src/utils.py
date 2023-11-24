@@ -1,8 +1,10 @@
+from typing import Union
+from fastapi import HTTPException, status
 from passlib.context import CryptContext
-import os
 from datetime import datetime, timedelta, timezone
-from typing import Union, Any
-from jose import jwt
+from jose import jwt, JWTError, ExpiredSignatureError
+from models.token import TokenPayload
+from src.db import db
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
@@ -42,8 +44,7 @@ def verify_password(password: str, hashed_pass: str) -> bool:
     return password_context.verify(password, hashed_pass)
 
 
-def create_access_token(subject: Union[str, Any],
-                        expires_delta: Union[int, None] = None) -> str:
+def create_access_token(payload: TokenPayload) -> str:
     """
     Create an access token for the specified subject with an optional
     expiration time.
@@ -58,14 +59,16 @@ def create_access_token(subject: Union[str, Any],
     Returns:
         str: The generated access token as a string.
     """
-    if expires_delta is not None:
+    if payload.exp is not None:
         expires = datetime.now(
-            tz=timezone.utc) + timedelta(minutes=expires_delta)
+            tz=timezone.utc) + timedelta(minutes=payload.exp)
     else:
         expires = datetime.now(
             tz=timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    to_encode = {"exp": expires, "sub": str(subject), "iss": "ALXOverflow"}
+    to_encode = {"user_id": payload.user_id, "exp": expires,
+                 #  "sub": str(payload.sub), "iss": payload.iss
+                 }
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, ALGORITHM)
     return encoded_jwt
 
@@ -79,3 +82,25 @@ def create_access_token(subject: Union[str, Any],
 #     to_encode = {"exp": expires_delta, "sub": str(subject)}
 #     encoded_jwt = jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, ALGORITHM)
 #     return encoded_jwt
+
+def decode_token(token: str) -> Union[str, None]:
+    """"""
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, ALGORITHM)
+        token_data = TokenPayload(**payload)
+
+        if datetime.fromtimestamp(token_data.exp).timestamp() < datetime.now().timestamp():
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token expired",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except (JWTError, ExpiredSignatureError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if token_data.user_id:
+        return token_data.user_id
+    return None
