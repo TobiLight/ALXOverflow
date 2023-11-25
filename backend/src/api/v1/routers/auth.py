@@ -12,7 +12,6 @@ from uuid import uuid4
 
 router = APIRouter(
     prefix="/api/auth", tags=["auth"],
-    responses={status.HTTP_404_NOT_FOUND: {"description": "Not found!"}},
 )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -30,7 +29,7 @@ async def login_user(sign_in: Annotated[OAuth2PasswordRequestForm, Depends()]):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, headers={'WWW-Authenticate': 'Bearer'}, detail="Invalid login!")
 
-        payload = TokenPayload(user_id=existing_user.id, exp=10)
+        payload = TokenPayload(user_id=existing_user.id, exp=30)
         user_token = create_access_token(payload=payload)
         
         return {"token_type": "bearer", "access_token": user_token}
