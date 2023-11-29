@@ -1,4 +1,4 @@
-from models.user import UserDetails, UserProfile, UserSignUp
+from schema.user import UserDetails, UserProfile, UserSignUp
 from src.db import db
 from uuid import uuid4
 from datetime import datetime

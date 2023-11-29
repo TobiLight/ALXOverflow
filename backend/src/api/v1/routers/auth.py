@@ -2,11 +2,11 @@ from typing import Union
 from typing_extensions import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from models.token import TokenPayload, TokenResponse
+from schema.token import TokenPayload, TokenResponse
 from services.user import create_user_account
 from src.utils import create_access_token, verify_password
 from src.db import db
-from models.user import UserSignUpOutput, UserSignUp, UserSignUpOutput
+from schema.user import UserSignUpOutput, UserSignUp, UserSignUpOutput
 from uuid import uuid4
 
 

@@ -2,8 +2,8 @@ from typing_extensions import Annotated
 from fastapi import APIRouter, Depends, Request, responses
 from starlette import status
 
-from models.question import CreateQuestion
-from models.user import UserProfile
+from schema.question import CreateQuestion
+from schema.user import UserProfile
 from services.question import add_question
 from src.deps import get_current_user
 from src.utils import decode_token

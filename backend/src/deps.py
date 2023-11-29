@@ -6,7 +6,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from .utils import decode_token
-from models.user import UserDetails
+from schema.user import UserDetails
 from src.api.v1.routers.auth import oauth2_scheme
 
 

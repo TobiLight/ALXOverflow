@@ -1,5 +1,5 @@
-from models.question import CreateQuestion
-from models.user import UserDetails, UserProfile, UserSignUp
+from schema.question import CreateQuestion
+from schema.user import UserDetails, UserProfile, UserSignUp
 from src.db import db
 from uuid import uuid4
 from datetime import datetime

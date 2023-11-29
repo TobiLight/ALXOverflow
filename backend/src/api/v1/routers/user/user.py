@@ -1,6 +1,6 @@
 from typing_extensions import Annotated
 from fastapi import APIRouter, Depends, Request, status
-from models.user import UserDetails, UserProfile
+from schema.user import UserDetails, UserProfile
 from services.user import update_user_account
 from src.deps import get_current_user
 from fastapi.responses import JSONResponse

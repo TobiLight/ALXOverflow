@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError, ExpiredSignatureError
-from models.token import TokenPayload
+from schema.token import TokenPayload
 from src.db import db
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes

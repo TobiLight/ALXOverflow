@@ -7,7 +7,8 @@ from fastapi.middleware.gzip import GZipMiddleware
 from src.db import db
 from os import environ
 import uvicorn
-
+from prisma import errors
+from fastapi.middleware.cors import CORSMiddleware
 
 
 def init_app():
@@ -23,9 +24,10 @@ def init_app():
     async def startup():
         try:
             await db.connect()
-            print("Database Connected!")
-        except:
-            print("An error has occured")
+            print("✅ Database Connected!")
+        except errors.PrismaError as e:
+            print("error: ", e)
+            print("❌ An error has occured")
 
     @app.on_event("shutdown")
     async def shutdown():
@@ -47,7 +49,7 @@ if __name__ == "__main__":
     port = environ.get("DB_PORT")
     host = environ.get("DB_HOST")
     if port is None:
-        port = 8000
+        port = 9000
     if host is None:
         host = 'localhost'
     uvicorn.run("src.main:app", host=host, port=int(port), reload=True)
