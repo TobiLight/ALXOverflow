@@ -5,11 +5,10 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError, ExpiredSignatureError
 from schema.token import TokenPayload
 from src.db import db
+from os import getenv
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
-ALGORITHM = "HS256"
-JWT_SECRET_KEY = "khgfghjkl"    # should be kept secret
 # should be kept secret
 JWT_REFRESH_SECRET_KEY = "kjhgfghjk"
 
@@ -69,7 +68,8 @@ def create_access_token(payload: TokenPayload) -> str:
     to_encode = {"user_id": payload.user_id, "exp": expires,
                  #  "sub": str(payload.sub), "iss": payload.iss
                  }
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, getenv(
+        "JWT_SECRET_KEY"), getenv("ALGORITHM"))
     return encoded_jwt
 
 
@@ -85,16 +85,18 @@ def create_access_token(payload: TokenPayload) -> str:
 
 def decode_token(token: str) -> Union[str, None]:
     """"""
+    print("incoming token", token)
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, ALGORITHM)
+        payload = jwt.decode(token, getenv(
+            "JWT_SECRET_KEY"), getenv("ALGORITHM"))
         token_data = TokenPayload(**payload)
 
-        if datetime.fromtimestamp(token_data.exp).timestamp() < datetime.now().timestamp():
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token expired",
-                headers={"Authorization": "Bearer"},
-            )
+        # if datetime.fromtimestamp(token_data.exp).timestamp() < datetime.now().timestamp():
+        #     raise HTTPException(
+        #         status_code=status.HTTP_401_UNAUTHORIZED,
+        #         detail="Token expired",
+        #         headers={"WWW-Authenticate": "Bearer"},
+        #     )
     except (JWTError, ExpiredSignatureError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
