@@ -93,13 +93,13 @@ def decode_token(token: str) -> Union[str, None]:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token expired",
-                headers={"WWW-Authenticate": "Bearer"},
+                headers={"Authorization": "Bearer"},
             )
     except (JWTError, ExpiredSignatureError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+            headers={"Authorization": "Bearer"},
         )
     if token_data.user_id:
         return token_data.user_id

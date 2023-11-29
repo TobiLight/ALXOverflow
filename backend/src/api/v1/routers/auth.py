@@ -27,7 +27,7 @@ async def login_user(sign_in: Annotated[OAuth2PasswordRequestForm, Depends()]):
         password = verify_password(sign_in.password, existing_user.password)
         if password is False:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, headers={'WWW-Authenticate': 'Bearer'}, detail="Invalid login!")
+                status_code=status.HTTP_401_UNAUTHORIZED, headers={'Authorization': 'Bearer'}, detail="Invalid login!")
 
         payload = TokenPayload(user_id=existing_user.id, exp=30)
         user_token = create_access_token(payload=payload)
