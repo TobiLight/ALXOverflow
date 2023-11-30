@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+.animated-nav {
+  transition: max-height 2.3s ease-in, padding 0.9s ease-in-out; /* Adjust the duration and easing function as needed */
+  max-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.animated-nav.open {
+  max-height: 300px; /* Adjust the max-height value to your desired height */
+  padding-top: 8px; /* Adjust the top padding value to your desired spacing */
+  transition: max-height 0.9s ease-in-out, padding 0.9s ease-in-out; /* Adjust the duration and easing function as needed */
+}
+@tailwind utilities;
