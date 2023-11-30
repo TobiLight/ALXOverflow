@@ -4,6 +4,7 @@ import IconBxsDownvote from '../icons/DownvoteIcon'
 import IconEye from '../icons/EyeIcon'
 import IconBxsTag from '../icons/TagIcon'
 import IconBxsUpvote from '../icons/UpvoteIcon'
+import { Link } from '@remix-run/react'
 
 function HomeQuestion() {
 	return (
@@ -12,7 +13,7 @@ function HomeQuestion() {
 				<p>posted 2 days ago</p>
 			</div>
 			<div className="grid gap-1">
-				<h1 className="font-semibold">How to update current branch with changes from master using TFS?</h1>
+				<Link to=""><h1 className="font-semibold hover:text-gray-500">How to update current branch with changes from master using TFS?</h1></Link>
 				<p className="text-sm">I have a project code that uses Team Foundation Server (TFS) for revision control. I created a new branch named br-feature from main using Visual Stud ...</p>
 			</div>
 			<div className="flex flex-wrap items-center gap-2 text-xs border-y py-2">

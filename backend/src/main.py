@@ -49,7 +49,7 @@ if __name__ == "__main__":
     port = environ.get("DB_PORT")
     host = environ.get("DB_HOST")
     if port is None:
-        port = 9000
+        port = 8000
     if host is None:
         host = 'localhost'
     uvicorn.run("src.main:app", host=host, port=int(port), reload=True)

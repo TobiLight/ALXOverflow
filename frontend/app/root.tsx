@@ -1,6 +1,6 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
 import stylesheet from "~/main.css";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -13,6 +13,17 @@ import {
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : [{ rel: "stylesheet", href: stylesheet }]),
 ];
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "ALXOverflow | Where Questions Find Answers 🚀" },
+    {
+      name: "description", content: `ALX Overflow is a specialized online 
+      platform designed to cater to the unique needs of students enrolled
+      in the ALX Software Engineering Program.`
+    },
+  ];
+};
 
 export default function App() {
   return (
