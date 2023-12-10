@@ -44,6 +44,16 @@ export async function getUserSession(request: Request) {
 	return await sessionStore.getSession(request.headers.get("Cookie"));
 }
 
+export async function getAccessToken(request: Request) {
+	let session = await getUserSession(request);
+	if (!session.has("user")) {
+		return undefined
+	}
+	let { accessToken } = session.get("user") as { accessToken: string, };
+	if (!accessToken) return undefined
+	return accessToken
+}
+
 
 export async function requireUserSession(request: Request): Promise<{ userId: string, accessToken: string } | undefined> {
 	let session = await getUserSession(request);
@@ -51,7 +61,6 @@ export async function requireUserSession(request: Request): Promise<{ userId: st
 		return undefined
 	}
 	let user = session.get("user") as { userId: string, accessToken: string, };
-	console.log(user.accessToken)
 	if (!user || (!user.accessToken && !user.userId) || typeof user !== "object") return undefined
 	return user;
 }
@@ -59,16 +68,37 @@ export async function requireUserSession(request: Request): Promise<{ userId: st
 export async function validateUser({ request, redirectTo }: { request: Request, redirectTo?: string }) {
 	let loggedInUser = await requireUserSession(request)
 	if (!loggedInUser) {
-		throw redirect(!redirectTo ? '/login' : `/login?redirectTo=${redirectTo}`)
+		throw redirect(!redirectTo ? '/sign-in' : `/login?redirectTo=${redirectTo}`)
 	}
 	return loggedInUser
 }
 
-export async function getUserId(request: Request): Promise<string | null> {
+export async function getUser(request: Request): Promise<{ email: string, first_name?: string, last_name?: string, username: string, bio: string } | undefined> {
+	let userId = await getUserId(request)
+	let accessToken = await getAccessToken(request)
+
+	if (!userId)
+		return undefined
+
+	let data = await fetch("http://localhost:8000/api/user", {
+		headers: {
+			"Authorization": `Bearer ${accessToken}`,
+		}
+	})
+
+	let user = await data.json()
+	if (Object.keys(user).includes('detail'))
+		return undefined
+	return user
+}
+
+export async function getUserId(request: Request): Promise<string | undefined> {
 	let session = await getUserSession(request)
-	const { userId } = session.get('user') as { userId: string, accessToken: string }
+	if (!session.has("user"))
+		return undefined
+	const { userId } = session.get('user') as { userId: string }
 	if (!userId.length || userId === undefined) {
-		return null
+		return undefined
 	}
 	return userId
 }

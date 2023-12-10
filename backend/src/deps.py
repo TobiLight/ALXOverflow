@@ -49,7 +49,11 @@ async def get_current_user(user_id: str = Depends(get_token_header)) -> UserDeta
         cannot be authenticated.
     """
     if not user_id:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials!",
+            headers={"Authorization": "Bearer"},
+        )
     user = await UserDetails.prisma().find_unique(where={"id": user_id})
     if not user:
         raise HTTPException(

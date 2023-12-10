@@ -1,5 +1,5 @@
 from typing_extensions import Annotated
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from schema.user import UserDetails, UserProfile
 from services.user import update_user_account
 from src.deps import get_current_user
@@ -8,8 +8,8 @@ from src.utils import decode_token
 
 
 router = APIRouter(
-    prefix="/api", tags=["user"], responses={404: {"description": "Not found"}},)
-
+    prefix="/api", tags=["user"], responses={404:
+                                             {"description": "Not found"}},)
 
 
 @router.get("/user")

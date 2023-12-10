@@ -1,10 +1,10 @@
 import { json, type LoaderFunction, type LoaderFunctionArgs, type MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import HomeQuestion from "~/components/HomePage/HomeQuestion";
 import Header from "~/components/Shared/Header";
 import IconQuestionCircle from "~/components/icons/QuestionIcon";
 import IconBxsTag from "~/components/icons/TagIcon";
-import { getUserSession, storage } from "~/session.server";
+import { getUser, getUserSession, storage } from "~/session.server";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -17,23 +17,21 @@ export const meta: MetaFunction = () => {
 	];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-	const session = await getUserSession(request);
-	if (session.has('user')) {
-		const { accessToken } = session.get('user') as { accessToken: string }
-		console.log(accessToken);
-		if (accessToken.length)
-			return json({ message: "Ok", isLoggedIn: true })
-	}
+export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
+	const user = await getUser(request);
+	if (user)
+		return json({ message: "Ok", isLoggedIn: true, user: { ...user } })
 
-	return json({ message: "Ok", isLoggedIn: false })
+	return json({ message: "Ok", isLoggedIn: false, user: undefined })
 }
 
 export default function Index() {
 	const data = useLoaderData<typeof loader>()
+	const user = data && data.user
+
 	return (
 		<main className="min-h-screen w-full">
-			<Header isLoggedIn={data.isLoggedIn} />
+			<Header isLoggedIn={data.isLoggedIn} user={user} />
 			<div className="md:w-3/5 lg:w-1/2 mx-auto">
 				<section className="w-full">
 					<form action="" className="w-full mt-8 flex items-center gap-1 px-4">
@@ -44,16 +42,36 @@ export default function Index() {
 					</form>
 				</section>
 
-				<div className="px-4 mt-8 mb-3 flex gap-1 items-center">
-					<IconQuestionCircle className="w-4 h-4" />
-					<h1 className="text-xl font-semibold">Recent Questions</h1>
-				</div>
 
-				<section className="border-t pt-6 px-4 mb-5">
+
+				<section className="borde-t pt-6 px-4 mb-5">
+					<div className="mt-8 mb-3 flex items-center justify-between">
+						<div className="flex gap-1 items-center">
+							<IconQuestionCircle className="w-4 h-4" />
+							<h1 className="text-xl font-semibold">Recently Asked Questions</h1>
+						</div>
+						<div className="see-more flex justify-center">
+							<Link to="#" className="w-auto  text-gray-500 hover:text-gray-700">See more</Link>
+						</div>
+					</div>
 					<div className="grid gap-5">
 						<HomeQuestion />
 						<HomeQuestion />
 						<HomeQuestion />
+					</div>
+				</section>
+
+				<section className="pt-6 px-4 mb-5">
+					<div className="mt-8 mb-3 flex items-center justify-between">
+						<div className="flex gap-1 items-center">
+							<IconQuestionCircle className="w-4 h-4" />
+							<h1 className="text-xl font-semibold">Most Asked Questions</h1>
+						</div>
+						<div className="see-more flex justify-center">
+							<Link to="#" className="w-auto  text-gray-500 hover:text-gray-700">See more</Link>
+						</div>
+					</div>
+					<div className="grid gap-5">
 						<HomeQuestion />
 						<HomeQuestion />
 						<HomeQuestion />

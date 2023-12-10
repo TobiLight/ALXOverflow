@@ -61,12 +61,14 @@ async def create_account(sign_up: UserSignUp):
     if sign_up.password not in sign_up.cpassword or sign_up.cpassword not in sign_up.password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Password does not match!")
-
+        
     existing_email = await db.user.find_unique(where={"email": sign_up.email})
+    existing_username = await db.user.find_unique(where={"username": sign_up.username})
 
-    if existing_email is not None:
+    if existing_email is not None or existing_username is not None:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="This email is in use already!")
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email or Username is in use already!")
 
     user = await create_user_account(sign_up)
+    return {"status": "Ok", "data": user}
     return UserSignUpOutput(message="Account created successfully!", user=user)
