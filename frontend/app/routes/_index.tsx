@@ -1,10 +1,11 @@
-import { json, type LoaderFunction, type LoaderFunctionArgs, type MetaFunction } from "@remix-run/node";
+import { json, LinksFunction, type LoaderFunction, type LoaderFunctionArgs, type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import HomeQuestion from "~/components/HomePage/HomeQuestion";
 import Header from "~/components/Shared/Header";
 import IconQuestionCircle from "~/components/icons/QuestionIcon";
 import IconBxsTag from "~/components/icons/TagIcon";
-import { getUser, getUserSession, storage } from "~/session.server";
+import { getUser } from "~/session.server";
+import toastStyles from "react-toastify/dist/ReactToastify.css";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -17,8 +18,11 @@ export const meta: MetaFunction = () => {
 	];
 };
 
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: toastStyles }];
+
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
 	const user = await getUser(request);
+
 	if (user)
 		return json({ message: "Ok", isLoggedIn: true, user: { ...user } })
 
@@ -45,10 +49,10 @@ export default function Index() {
 
 
 				<section className="borde-t pt-6 px-4 mb-5">
-					<div className="mt-8 mb-3 flex items-center justify-between">
-						<div className="flex gap-1 items-center">
+					<div className="mt-8 mb-3 flex gap-4 items-end sm:items-center justify-between">
+						<div className="grid gap-1 items-center flex-grow">
 							<IconQuestionCircle className="w-4 h-4" />
-							<h1 className="text-xl font-semibold">Recently Asked Questions</h1>
+							<h1 className="text-lg sm:text-xl font-semibold w-full">Recently Asked Questions</h1>
 						</div>
 						<div className="see-more flex justify-center">
 							<Link to="#" className="w-auto  text-gray-500 hover:text-gray-700">See more</Link>
@@ -108,7 +112,7 @@ export default function Index() {
 						</p>
 					</div>
 				</section>
-			</div>
+			</div >
 
 			<footer className="absolute bottom-auto w-full text-center flex items-center justify-center py-2 border-t text-sm">
 				<p>Made with love by <span className="font-semibold">0xTobii</span></p>

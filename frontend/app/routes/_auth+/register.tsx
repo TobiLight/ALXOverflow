@@ -1,8 +1,10 @@
-import { ActionFunctionArgs, json, redirect } from '@remix-run/node'
-import { Link, useActionData, useFetcher, useNavigation } from '@remix-run/react';
-import React, { useEffect, useState } from 'react'
-import AuthForm from '~/components/Form/AuthForm'
-import { storage } from '~/session.server';
+import { ActionFunctionArgs, LinksFunction, json, redirect } from '@remix-run/node'
+import { Link, useActionData, useNavigation } from '@remix-run/react';
+import { useEffect, useState } from 'react'
+import { ALXForm as AuthForm } from '~/components/Form/Form'
+import toastStyles from "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from 'react-toastify';
+import { commitSession, getSession } from '~/session.server';
 
 function validateEmail(email: string) {
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,6 +19,8 @@ function validatePassword(password: string, cpassword: string): boolean {
 	return true
 }
 
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: toastStyles }];
+
 export async function action({
 	request
 }: ActionFunctionArgs) {
@@ -28,7 +32,6 @@ export async function action({
 	const cpassword = body.get("cpassword") as string
 	const username = body.get("username") as string
 	const errors = {} as { email: string, password: string, username: string }
-	const session = storage
 
 	if (!validateEmail(email))
 		errors.email = "Invalid e-mail address"
@@ -44,29 +47,33 @@ export async function action({
 
 
 	try {
-		const data = await fetch("http://localhost:8000/api/auth/signup", {
+		const data = await fetch("http://localhost:8000/api/auth/register", {
 			method: "POST", headers: {
 				'Accept': 'application/json',
 				'Content-Type': 'application/json'
-			}, body: JSON.stringify({ "email": email, "username": username, "password": password, "cpassword": cpassword })
+			}, body: JSON.stringify({ "first_name": firstname, "last_name": lastname, "email": email, "username": username, "password": password, "cpassword": cpassword })
 		})
 		const response = await data.json()
 		if (Object.keys(response).includes('detail'))
 			throw new Error(response.detail)
 
 		if (response.status === "Ok") {
-			// session.flash('')
-			return redirect("/sign-in")
+			const session = await getSession(request.headers.get('Cookie'))
+			session.flash('createAccount', 'Account created successfully!')
+			return redirect("/login", {
+				headers: {
+					"Set-Cookie": await commitSession(session),
+				}
+			})
 		}
 	} catch (err: any) {
 		if (err.errno === 'ECONNREFUSED')
-			return json({ detail: "An error has occured!" }, { status: 500 })
-		return json({ detail: err.message })
+			return json({ detail: "An error has occured!", errors: { ...errors } }, { status: 500 })
+		return json({ detail: err.message, errors: { ...errors } })
 	}
 
 	// return json({ detail: "Ok", errors: { ...errors } })
 }
-
 
 function SignUp() {
 	const [disableBtn, setDisableBtn] = useState<boolean>(true)
@@ -85,10 +92,18 @@ function SignUp() {
 			setDisableBtn(true)
 	}, [password, cpassword])
 
+	useEffect(() => {
+		if (actionData?.detail)
+			toast.error(actionData.detail, {
+				autoClose: 3000
+			})
+	}, [actionData])
+
 	return (
 		<main className="min-h-screen w-full px-3 sm:w-3/4 md:w-3/6 lg:w-2/5 mx-auto pb-8">
+			<ToastContainer />
 			<div className="grid gap-3">
-				<AuthForm detail={actionData?.detail} formTitle='Sign up' btnLabel='Sign up' btnDisabled={disableBtn}>
+				<AuthForm formTitle='Sign up' btnLabel='Sign up' btnDisabled={disableBtn}>
 					<label htmlFor="firstname">
 						Firstname
 						<input type="text" name="firstname" id="firstname" placeholder='John' className='w-full rounded border bg-gray-100 p-3 focus:outline-none' />
@@ -132,7 +147,7 @@ function SignUp() {
 					</label>
 				</AuthForm>
 				<div className="flex justify-between items-center text-gray-600">
-					<p>Have an account already? <Link to="/sign-in" className='font-semibold'>Sign in</Link></p>
+					<p>Have an account already? <Link to="/login" className='font-semibold'>Sign in</Link></p>
 				</div>
 			</div>
 

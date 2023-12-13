@@ -1,8 +1,10 @@
+from fastapi import HTTPException, status
 from schema.user import UserDetails, UserProfile, UserSignUp
 from src.db import db
 from uuid import uuid4
 from datetime import datetime
 from src.utils import hash_password
+from prisma import errors
 
 
 async def create_user_account(user: UserSignUp) -> UserProfile:
@@ -46,6 +48,8 @@ async def create_user_account(user: UserSignUp) -> UserProfile:
 
     new_user = await db.user.create({
         "id": str(uuid4()),
+        "first_name": user.first_name,
+        "last_name": user.last_name,
         "email": user.email,
         "username": user.username,
         "password": hash_password(user.password)
@@ -78,19 +82,25 @@ async def update_user_account(user: UserDetails, user_id: str):
     Args:
         user (UserDetails): A UserDetails object containing the updated user
         information.
-        user_id (str): The unique identifier of the user account to be updated.
+        user_id (str): The unique identifier of the user account to be
+        updated.
 
     Returns:
         dict: A dictionary containing the updated user account details.
     """
-    update_user = await db.user.update(where={"id": user_id}, data={
+    try:
+        update_user = await db.user.update(where={"id": user_id}, data={
         "first_name": user.first_name,
         "last_name": user.last_name,
         "bio": user.bio,
-        "profile_picture": user.profile_picture,
-        "username": user.username,
+        # "profile_picture": user.profile_picture,
+        # "username": user.username,
         "updated_at": datetime.now()
     })
+    except errors.PrismaError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, headers={
+                            'Authorization': 'Bearer'},
+                            detail="Error updating profile!")
     
     user = {
         "id": user_id,
@@ -107,6 +117,17 @@ async def update_user_account(user: UserDetails, user_id: str):
     }
     return UserDetails(**user)
 
+
+async def delete_user_account(user_id: str):
+    """"""
+    try:
+        await db.user.delete(where={'id': user_id})
+    except errors.PrismaError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, headers={
+                            'Authorization': 'Bearer'},
+                            detail="User doesn't exist!")
+    return True
+        
 
 async def updload_user_profile_image():
     """"""

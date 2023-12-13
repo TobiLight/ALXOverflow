@@ -4,7 +4,7 @@ import IconCloseSharp from '../icons/CloseMenuIcon'
 import IconMenuMotion from '../icons/MenuIcon'
 import { IUser } from '~/utils/interfaces'
 
-function Header({ isLoggedIn, user }: { isLoggedIn: boolean, user: IUser }) {
+function Header({ isLoggedIn, user }: { isLoggedIn: boolean, user: IUser | undefined }) {
 	const [showMobileNav, setMobileNav] = useState<boolean>(false)
 
 	return (
@@ -27,8 +27,8 @@ function Header({ isLoggedIn, user }: { isLoggedIn: boolean, user: IUser }) {
 						</li>
 						<li><Link to='/questions'>Questions</Link></li>
 						{!isLoggedIn &&
-							<> <li><a href="/sign-in">Sign In</a></li>
-								<li><a href="/sign-up">Create an account</a></li>
+							<> <li><a href="/login">Sign In</a></li>
+								<li><a href="/register">Create an account</a></li>
 							</>
 						}
 						{
@@ -36,7 +36,7 @@ function Header({ isLoggedIn, user }: { isLoggedIn: boolean, user: IUser }) {
 								<li><a href='/question/ask'>Ask</a></li>
 								<li><a href='/dashboard/profile'>Dashboard</a></li>
 								<li><a href='/dashboard/settings'>Settings</a></li>
-								<form action="/sign-out" method="post">
+								<form action="/logout" method="post">
 									<button type="submit">Sign out</button>
 								</form>
 							</>
@@ -56,8 +56,8 @@ function Header({ isLoggedIn, user }: { isLoggedIn: boolean, user: IUser }) {
 					<li><Link to='/questions'>Questions</Link></li>
 
 					{!isLoggedIn &&
-						<> <li><a href="/sign-in">Sign In</a></li>
-							<li><a href="/sign-up">Create an account</a></li>
+						<> <li><a href="/login">Sign In</a></li>
+							<li><a href="/register">Create an account</a></li>
 						</>
 					}
 					{
@@ -67,10 +67,10 @@ function Header({ isLoggedIn, user }: { isLoggedIn: boolean, user: IUser }) {
 								<div className="profile-icon font-bold rounded-full bg-gray-100 flex items-center justify-center p-2 w-12 h-12">
 									<p>{user && user.username && user.username[0]}</p>
 								</div>
-								<div className="absolute profile-icon-submenu right-0 gap-3 p-3 bg-white">
-									<li><a href='/dashboard/profile'>Dashboard</a></li>
-									<li><a href='/dashboard/settings'>Settings</a></li>
-									<form action="/sign-out" method="post">
+								<div className="absolute profile-icon-submenu w-[150px] drop-shadow-md hidden right-0 gap-3 p-3 bg-white">
+									<li className='translate-x-0 hover:translate-x-2 ease-in transition-all'><a href='/dashboard/profile'>Dashboard</a></li>
+									<li className='translate-x-0 hover:translate-x-2 ease-in transition-all'><a href='/dashboard/settings'>Settings</a></li>
+									<form action="/logout" method="post" className='translate-x-0 hover:translate-x-2 ease-in transition-all'>
 										<button type="submit">Sign out</button>
 									</form>
 								</div>

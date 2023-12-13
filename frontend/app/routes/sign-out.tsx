@@ -1,15 +1,15 @@
-import { LoaderFunction, redirect, ActionFunction, json, ActionFunctionArgs } from "@remix-run/node"
-import { requireUserSession, storage } from "~/session.server"
+import { LoaderFunction, redirect, ActionFunction, ActionFunctionArgs } from "@remix-run/node"
+import { destroySession, getSession, } from "~/session.server"
 
 export const loader: LoaderFunction = async ({ request }) => {
 	return redirect('/sign-in')
 }
 
 export const action: ActionFunction = async ({ request }: ActionFunctionArgs) => {
-	const session = await storage.getSession()
+	const session = await getSession()
 	return redirect("/sign-in", {
 		headers: {
-			"Set-Cookie": await storage.destroySession(session),
+			"Set-Cookie": await destroySession(session),
 		},
 	});
 }

@@ -5,7 +5,7 @@ import { createCookieSessionStorage, redirect } from "@remix-run/node";
 // 	throw new Error("SESSION_SECRET must be set");
 // }
 
-const sessionStore = createCookieSessionStorage({
+export const { getSession, commitSession, destroySession } = createCookieSessionStorage({
 	cookie: {
 		name: '__session',
 		secrets: ['super-secret-secret'],
@@ -24,12 +24,12 @@ const sessionStore = createCookieSessionStorage({
  * @returns Response that sets cookie
  */
 export const createUserSession = async ({ accessToken, userId }: { accessToken: string, userId: string }) => {
-	const session = await sessionStore.getSession()
+	const session = await getSession()
 
 	session.set('user', { userId, accessToken })
 	return redirect('/', {
 		headers: {
-			"Set-Cookie": await sessionStore.commitSession(session),
+			"Set-Cookie": await commitSession(session),
 		},
 		status: 301
 	});
@@ -41,7 +41,7 @@ export const createUserSession = async ({ accessToken, userId }: { accessToken: 
  * @returns Current session store in the cookie
  */
 export async function getUserSession(request: Request) {
-	return await sessionStore.getSession(request.headers.get("Cookie"));
+	return await getSession(request.headers.get("Cookie"));
 }
 
 export async function getAccessToken(request: Request) {
@@ -68,7 +68,7 @@ export async function requireUserSession(request: Request): Promise<{ userId: st
 export async function validateUser({ request, redirectTo }: { request: Request, redirectTo?: string }) {
 	let loggedInUser = await requireUserSession(request)
 	if (!loggedInUser) {
-		throw redirect(!redirectTo ? '/sign-in' : `/login?redirectTo=${redirectTo}`)
+		throw redirect(!redirectTo ? '/login' : `/login?redirectTo=${redirectTo}`)
 	}
 	return loggedInUser
 }
@@ -80,7 +80,7 @@ export async function getUser(request: Request): Promise<{ email: string, first_
 	if (!userId)
 		return undefined
 
-	let data = await fetch("http://localhost:8000/api/user", {
+	let data = await fetch("http://localhost:8000/api/user/profile/", {
 		headers: {
 			"Authorization": `Bearer ${accessToken}`,
 		}
@@ -102,5 +102,3 @@ export async function getUserId(request: Request): Promise<string | undefined> {
 	}
 	return userId
 }
-
-export const storage = sessionStore

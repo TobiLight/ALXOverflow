@@ -4,8 +4,6 @@ from typing import Union
 from typing_extensions import Annotated
 from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field
-from prisma.models import User
-from prisma.bases import BaseUser
 from prisma.bases import BaseUser
 from fastapi.encoders import jsonable_encoder
 
@@ -26,6 +24,8 @@ class UserSignIn(BaseModel):
 
 class UserSignUp(BaseModel):
     email: EmailStr = Field(...)
+    first_name: Union[str, None] = None
+    last_name: Union[str, None] = None
     username: str = Field(...)
     password: str = Field(...)
     cpassword: str = Field(...)
@@ -51,7 +51,7 @@ class UserProfile(BaseModel):
 
 
 class UserDetails(BaseUser):
-    # id: str
+    id: str
     email: EmailStr
     first_name: Union[str, None] = None
     last_name: Union[str, None] = None
@@ -70,6 +70,11 @@ class UserDetails(BaseUser):
         user_dict = jsonable_encoder(self)
         return user_dict
 
+class UpdateUser(BaseModel):
+    first_name: Union[str, None] = None
+    last_name: Union[str, None] = None
+    bio: Union[str, None]
+    # profile_picture: Union[str, None] = None
 
 class UserSignInOutput(BaseModel):
     token: str

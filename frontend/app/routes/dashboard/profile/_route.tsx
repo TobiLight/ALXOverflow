@@ -1,14 +1,8 @@
 import { Link } from '@remix-run/react'
 import { useState } from 'react';
 import { ProfileOverview } from '~/components/Dashboard/Overview';
-import { useParentRouteData } from '~/hook/useParentRouteData';
+import { useParentRouteData } from '~/hooks/useParentRouteData';
 import { IUser } from '~/utils/interfaces';
-
-
-
-// export async function loader<LoaderFunction>({ context }: LoaderFunctionArgs) {
-// 	return json({ message: "Ok" })
-// }
 
 function UserProfile() {
 	const [showOverview, setShowOverview] = useState<boolean>(true)
@@ -34,6 +28,13 @@ function UserProfile() {
 				<div className="user-bio mt-5">
 					<p>{user && user.bio}</p>
 				</div>
+				<div className="text-xs">
+					<div className="w-auto mt-2">
+						<div className="border rounded p-1 w-auto bg-gray-100">
+							<p>Joined 23/09/2023</p>
+						</div>
+					</div>
+				</div>
 			</div>
 			<section className="stats pb-8">
 				<div className="flex border-b p-3 justify-between items-center text-center font-semibold">
@@ -49,7 +50,7 @@ function UserProfile() {
 						<ProfileOverview /> :
 						<div className="grid px-3 py-8">
 							<div className="flex flex-col gap-4">
-								<div className="w-full flex justify-between gap-4">
+								<div className="w-full flex flex-col sm:flex-row justify-between gap-4">
 									<div className="border rounded p-3 flex flex-col justify-center items-center w-full text-sm bg-gray-100">
 										<h1 className='font-semibold'>Questions</h1>
 										<p>4</p>
@@ -59,7 +60,7 @@ function UserProfile() {
 										<p>40</p>
 									</div>
 								</div>
-								<div className="w-full flex justify-between gap-4">
+								<div className="w-full flex flex-col sm:flex-row justify-between gap-4">
 									<div className="border rounded p-3 w-full flex flex-col justify-center items-center text-sm bg-gray-100">
 										<h1 className='font-semibold'>Reputation score</h1>
 										<p>987pts</p>
@@ -69,35 +70,11 @@ function UserProfile() {
 										<p>N/A</p>
 									</div>
 								</div>
-
 							</div>
 						</div>
 					}
-					{/* <div className="grid grid-cols-2 gap-5 mt-6 text-center">
-					<div className="shadow border rounded-md min-h-[30px]">
-						<h1 className='text-sm'>Questions asked</h1>
-						<p className='font-bold'>10</p>
-					</div>
-					<div className="shadow border rounded-md min-h-[30px]">
-						<h1 className='text-sm'>Questions answered</h1>
-						<p className='font-bold'>10</p>
-					</div>
-					<div className="shadow border rounded-md min-h-[30px]">
-						<h1 className='text-sm'>Upvotes</h1>
-						<p className='font-bold'>10</p>
-					</div>
-					<div className="shadow border rounded-md min-h-[30px]">
-						<h1 className='text-sm'>Downvotes</h1>
-						<p className='font-bold'>10</p>
-					</div>
-					<div className="shadow border rounded-md min-h-[30px]">
-						<h1 className='text-sm'>Reputation</h1>
-						<p className='font-bold'>10</p>
-					</div>
-				</div> */}
 				</div>
 			</section>
-
 		</main >
 	)
 }
