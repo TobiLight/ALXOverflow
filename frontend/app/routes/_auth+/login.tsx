@@ -49,8 +49,13 @@ export async function action({
 		if (!response.status)
 			throw new Error(response.detail)
 
+		const redirectUrl = request.headers.get('referer')?.split('?')
+		let redirectTo: string | undefined = undefined
+		if (redirectUrl && redirectUrl?.length > 1)
+			redirectTo = '/' + redirectUrl[1]
+
 		if (response.status === "Ok")
-			return await createUserSession({ accessToken: response.access_token, userId: response.data.id })
+			return await createUserSession({ redirectTo: redirectTo || undefined, accessToken: response.access_token, userId: response.data.id })
 	} catch (err: any) {
 		if (err.message.includes('Unexpected token'))
 			return json({ detail: 'An error has occured!' }, { status: 500 })

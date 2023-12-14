@@ -33,7 +33,7 @@ function Header({ isLoggedIn, user }: { isLoggedIn: boolean, user: IUser | undef
 						}
 						{
 							isLoggedIn && <>
-								<li><a href='/question/ask'>Ask</a></li>
+								<li><a href='/question/create'>Ask</a></li>
 								<li><a href='/dashboard/profile'>Dashboard</a></li>
 								<li><a href='/dashboard/settings'>Settings</a></li>
 								<form action="/logout" method="post">
@@ -62,7 +62,7 @@ function Header({ isLoggedIn, user }: { isLoggedIn: boolean, user: IUser | undef
 					}
 					{
 						isLoggedIn && <>
-							<li><a href='/question/ask'>Ask</a></li>
+							<li><a href='/question/create'>Ask</a></li>
 							<div className="cursor-pointer relative profile">
 								<div className="profile-icon font-bold rounded-full bg-gray-100 flex items-center justify-center p-2 w-12 h-12">
 									<p>{user && user.username && user.username[0]}</p>

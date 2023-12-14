@@ -27,7 +27,7 @@ async def login_user(sign_in: UserSignIn):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, headers={'Authorization': 'Bearer'}, detail="Invalid login!")
 
-        payload = TokenPayload(user_id=existing_user.id, exp=60)
+        payload = TokenPayload(user_id=existing_user.id, exp=10)
         user_token = create_access_token(payload=payload)
         user = {
             "id": existing_user.id,

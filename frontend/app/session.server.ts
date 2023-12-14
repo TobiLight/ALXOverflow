@@ -23,11 +23,11 @@ export const { getSession, commitSession, destroySession } = createCookieSession
  * @param accessToken The user's JWT, stored in the user's session
  * @returns Response that sets cookie
  */
-export const createUserSession = async ({ accessToken, userId }: { accessToken: string, userId: string }) => {
+export const createUserSession = async ({ accessToken, userId, redirectTo }: { redirectTo?: string, accessToken: string, userId: string }) => {
 	const session = await getSession()
 
 	session.set('user', { userId, accessToken })
-	return redirect('/', {
+	return redirect(redirectTo || '/', {
 		headers: {
 			"Set-Cookie": await commitSession(session),
 		},

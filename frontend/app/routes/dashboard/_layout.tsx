@@ -15,11 +15,11 @@ function DashboardLayout() {
 	const data = useLoaderData<typeof loader>()
 	const user = data && data.user
 	return (
-		<main>
+		<>
 			<Header isLoggedIn={data.isLoggedIn} user={user} />
 			<Outlet />
 			<footer className='text-center p-3 border-t text-sm font-semibold'>ALXOverflow &copy; {new Date().getFullYear()}</footer>
-		</main>
+		</>
 	)
 }
 
